@@ -46,18 +46,6 @@ class Client:
     return new_history_timestamp > old_history_timestamp
 
 
-#would be cool to have the following
-####
-####command to open my history in browser tab
-####be able to turn off so you only log ad-hoc
-####command to add tag to list of tags being used
-####way to add a tag to a command as it is being issued.  Perhaps the command before should be tag... that lets you set a one time tag.
-####command to clear tags being used
-####of course tags that are specified in the env variables are never cleared
-####logging to syslog any problems
-####command to pull last n commands to local history
-####command to pull last n commands with tags a...z to local history
-####batch up commands to send to server
 socket.setdefaulttimeout(SOCKET_TIMEOUT)
 client = Client(sys.argv[1])
 client.send_command(sys.argv[2])
