@@ -5,30 +5,36 @@ import socket
 import sys
 import os
 
-SOCKET_TIMEOUT=0.5
-#URL="http://localhost:8080/history/add"
-URL="http://bash-history.appspot.com/history/add"
+SOCKET_TIMEOUT=10
+URL="http://localhost:8080/history/add"
+#URL="http://bash-history.appspot.com/history/add"
 
 class Client:
-  def __init__(self, id):
+  def __init__(self):
     if not os.environ.has_key('HOME'):
       raise Exception, "HOME environment variable must be set"
+    if not os.environ.has_key('SHELL_SINK_ID'):
+      raise Exception, "SHELL_SINK_ID environment variable must be set"
 
     self.history_file = os.environ['HOME'] + "/.bash_history"
     self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
-    self.id = id
+    self.id = os.environ['SHELL_SINK_ID']
 
-  def send_command(self, command):
-    if not self.has_new_command():
-      return None
-
-    params = {'hash' : self.id, 'command' : command}
+  def send_command(self):
+    params = {'hash' : self.id, 'command' : self.latest_from_history()}
     data = urllib.urlencode(params)
     url = URL + '?' + data
-    try:
-      req = urllib2.urlopen(url)
-    except:
-      pass
+    self.spawn_process(http_get, url)
+    
+  def spawn_process(self, func, arg):
+    pid = os.fork()
+    if pid > 0:
+      sys.exit(0)
+    os.setsid()
+    pid = os.fork()
+    if pid > 0:
+      sys.exit(0)
+    func(arg)
 
   def has_new_command(self):
     new_history_timestamp = os.path.getmtime(self.history_file)
@@ -42,10 +48,19 @@ class Client:
     file = open(self.history_timestamp,"w")
     file.writelines([str(new_history_timestamp)])
     file.close()
-
     return new_history_timestamp > old_history_timestamp
 
+  def latest_from_history(self):
+    file = open(self.history_file, "r")
+    latest = file.readlines()[-1]
+    file.close()
+    return latest
+
+def http_get(url):
+  try:
+    urllib2.urlopen(url)
+  except:
+    pass
 
 socket.setdefaulttimeout(SOCKET_TIMEOUT)
-client = Client(sys.argv[1])
-client.send_command(sys.argv[2])
+Client().send_command()
