@@ -12,18 +12,15 @@ URL="http://localhost:8080/history/add"
 class Client:
   def __init__(self):
     self.verify_environment
-    self.history_file = self.environment()['HOME'] + "/.bash_history"
-    self.history_timestamp = self.environment()['HOME'] + "/.bash_history_timestamp"
-    self.id = self.environment()['SHELL_SINK_ID']
+    self.history_file = os.environ['HOME'] + "/.bash_history"
+    self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
+    self.id = os.environ['SHELL_SINK_ID']
 
   def verify_environment(self):
-    if not self.environment().has_key('HOME'):
+    if not os.environ.has_key('HOME'):
       raise Exception, "HOME environment variable must be set"
-    if not self.environment().has_key('SHELL_SINK_ID'):
+    if not os.environ.has_key('SHELL_SINK_ID'):
       raise Exception, "SHELL_SINK_ID environment variable must be set"
-
-  def environment(self):
-    return os.environ
 
   def url_with_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history()}
@@ -44,18 +41,30 @@ class Client:
     func(arg)
 
   def has_new_command(self):
-    new_history_timestamp = os.path.getmtime(self.history_file)
-    old_history_timestamp = new_history_timestamp - 1
+    new_history_timestamp = self.history_file_timestamp()
+    timestamp_if_there_is_no_last_recorded = new_history_timestamp - 1
+    last_recorded_history_timestamp = self.last_recorded_history_timestamp()
+    if not last_recorded_history_timestamp:
+      last_recorded_history_timestamp = timestamp_if_there_is_no_last_recorded
 
+    self.record_new_last_recorded_history_timestamp(new_history_timestamp)
+    return new_history_timestamp > last_recorded_history_timestamp
+
+  def history_file_timestamp(self):
+    return os.path.getmtime(self.history_file)
+
+  def last_recorded_history_timestamp(self):
     if os.path.exists(self.history_timestamp):
       file = open(self.history_timestamp,"r")
       old_history_timestamp = float(file.readline())
       file.close()
+      return old_history_timestamp
+    return None
 
+  def record_new_last_recorded_history_timestamp(self, timestamp):
     file = open(self.history_timestamp,"w")
-    file.writelines([str(new_history_timestamp)])
+    file.writelines([str(timestamp)])
     file.close()
-    return new_history_timestamp > old_history_timestamp
 
   def latest_from_history(self):
     file = open(self.history_file, "r")
