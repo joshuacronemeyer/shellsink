@@ -6,19 +6,24 @@ import sys
 import os
 
 SOCKET_TIMEOUT=10
-URL="http://localhost:8080/history/add"
-#URL="http://bash-history.appspot.com/history/add"
+#URL="http://localhost:8080/history/add"
+URL="http://bash-history.appspot.com/history/add"
 
 class Client:
   def __init__(self):
-    if not os.environ.has_key('HOME'):
+    self.verify_environment
+    self.history_file = self.environment()['HOME'] + "/.bash_history"
+    self.history_timestamp = self.environment()['HOME'] + "/.bash_history_timestamp"
+    self.id = self.environment()['SHELL_SINK_ID']
+
+  def verify_environment(self):
+    if not self.environment().has_key('HOME'):
       raise Exception, "HOME environment variable must be set"
-    if not os.environ.has_key('SHELL_SINK_ID'):
+    if not self.environment().has_key('SHELL_SINK_ID'):
       raise Exception, "SHELL_SINK_ID environment variable must be set"
 
-    self.history_file = os.environ['HOME'] + "/.bash_history"
-    self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
-    self.id = os.environ['SHELL_SINK_ID']
+  def environment(self):
+    return os.environ
 
   def send_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history()}
