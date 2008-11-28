@@ -6,8 +6,8 @@ import sys
 import os
 
 SOCKET_TIMEOUT=10
-#URL="http://localhost:8080/history/add"
-URL="http://bash-history.appspot.com/history/add"
+URL="http://localhost:8080/history/add"
+#URL="http://bash-history.appspot.com/history/add"
 
 class Client:
   def __init__(self):
@@ -25,11 +25,13 @@ class Client:
   def environment(self):
     return os.environ
 
-  def send_command(self):
+  def url_with_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history()}
     data = urllib.urlencode(params)
-    url = URL + '?' + data
-    self.spawn_process(http_get, url)
+    return URL + '?' + data
+
+  def send_command(self):
+    self.spawn_process(http_get, self.url_with_command())
     
   def spawn_process(self, func, arg):
     pid = os.fork()
@@ -67,5 +69,6 @@ def http_get(url):
   except:
     pass
 
-socket.setdefaulttimeout(SOCKET_TIMEOUT)
-Client().send_command()
+if __name__== '__main__':
+  socket.setdefaulttimeout(SOCKET_TIMEOUT)
+  Client().send_command()

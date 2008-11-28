@@ -13,7 +13,12 @@ class TestShellSinkClient(unittest.TestCase):
     client.set_environment({'HOME' : None})
     self.assertRaises(Exception, client.verify_environment)
 
-
+  def test_url_is_correct(self):
+    client = StubClient()
+    url_hash = {'id': "1234", 'url': "http://localhost:8080/history/add?"}
+    client.id, client.URL = url_hash['id'], url_hash['url']
+    correct_url = "%(url)scommand=the+latest+command&hash=%(id)s" % url_hash
+    self.assertEqual(client.url_with_command(), correct_url)
 
 class StubClient(Client):
 
@@ -25,6 +30,9 @@ class StubClient(Client):
 
   def environment(self):
     return self.env_hash
+
+  def latest_from_history(self):
+    return "the latest command"
   
 
 if __name__ == '__main__':
