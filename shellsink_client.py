@@ -2,6 +2,7 @@
 import urllib2
 import urllib
 import socket
+import getopt
 import sys
 import os
 
@@ -14,6 +15,9 @@ class Client:
     self.verify_environment
     self.history_file = os.environ['HOME'] + "/.bash_history"
     self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
+    self.config = os.environ['HOME'] + "/.faucet"
+    self.config_file = os.environ['HOME'] + "/.faucet/config"
+    self.disable_slug = os.environ['HOME'] + "/.faucet/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
 
   def verify_environment(self):
@@ -28,7 +32,8 @@ class Client:
     return URL + '?' + data
 
   def send_command(self):
-    self.spawn_process(http_get, self.url_with_command())
+    if self.has_new_command():
+      self.spawn_process(http_get, self.url_with_command())
     
   def spawn_process(self, func, arg):
     pid = os.fork()
@@ -72,12 +77,67 @@ class Client:
     file.close()
     return latest
 
+  def enable(self):
+    if os.path.exists(self.disable_slug):
+      os.remove(self.disable_slug) 
+    
+  def disable(self):
+    file = open(self.disable_slug, "w")
+    file.close()
+
+  def is_enabled(self):
+    return not os.path.exists(self.disable_slug)
+
+  def conf(self):
+    base = ["""#faucet, a client for remote archiving your shell history"""]
+    if not os.path.exists(self.config):
+      os.mkdir(self.config)
+    if not os.path.exists(self.config_file):
+      file = open(self.config_file,"w")
+      file.writelines(base)
+      file.close()
+    file = open(self.config_file, "r")
+    self.config = file.readlines()
+    file.close()
+
 def http_get(url):
   try:
     urllib2.urlopen(url)
   except:
     pass
 
-if __name__== '__main__':
+def usage():
+  print """usage: faucet [hed] [help|enable|disable]"""
+
+def main():
+  try:
+    opts, args = getopt.getopt(sys.argv[1:], "hed", ["help", "enable", "disable"])
+  except getopt.GetoptError, err:
+    # print help information and exit:
+    print str(err) # will print something like "option -a not recognized"
+    usage()
+    sys.exit(2)
+
+  client = Client()
+  client.conf()
+  for o, a in opts:
+    if o in ("-h", "--help"):
+      usage()
+      sys.exit()
+    elif o in ("-e", "--enable"):
+      client.enable()
+      sys.exit(0)
+    elif o in ("-d", "--disable"):
+      client.disable()
+      sys.exit(0)
+    else:
+      assert False, "unhandled option"
+
   socket.setdefaulttimeout(SOCKET_TIMEOUT)
-  Client().send_command()
+  if client.is_enabled():
+    client.send_command()
+
+if __name__== '__main__':
+  main()
+
+

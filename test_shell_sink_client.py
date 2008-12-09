@@ -40,10 +40,17 @@ class TestShellSinkClient(unittest.TestCase):
     client.old_time = None
     self.assertEqual(True, client.has_new_command())
 
+  def test_nothing_happens_if_no_new_command(self):
+    client = StubClient()
+    client.new_time = 1
+    client.old_time = 2
+    client.send_command()
+    self.assertEquals(False, client.spawned)
 
 class StubClient(Client):
 
   def __init__(self):
+    self.spawned = False
     pass
 
   def latest_from_history(self):
@@ -57,6 +64,9 @@ class StubClient(Client):
 
   def record_new_last_recorded_history_timestamp(self, timestamp):
     pass
+
+  def spawn_process(self, func, arg):
+    self.spawned = True
   
 
 if __name__ == '__main__':
