@@ -17,9 +17,9 @@ class TestShellSinkClient(unittest.TestCase):
 
   def test_url_is_correct(self):
     client = StubClient()
-    url_hash = {'id': "1234", 'url': "http://localhost:8080/history/add?"}
-    client.id, client.URL = url_hash['id'], url_hash['url']
-    correct_url = "%(url)scommand=the+latest+command&hash=%(id)s" % url_hash
+    url_hash = {'id': "1234", 'url': "http://localhost:8080/history/add?", "tags": "abc"}
+    client.id, client.URL, client.tags = url_hash['id'], url_hash['url'], url_hash['tags']
+    correct_url = "%(url)scommand=the+latest+command&hash=%(id)s&tags=%(tags)s" % url_hash
     self.assertEqual(client.url_with_command(), correct_url)
 
   def test_new_command_is_detected_when_timestamp_is_newer(self):

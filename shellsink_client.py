@@ -19,15 +19,15 @@ class Client:
     self.config_file = os.environ['HOME'] + "/.faucet/config"
     self.disable_slug = os.environ['HOME'] + "/.faucet/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
-    self.tags = os.environ['FAUCET_TAGS']
+    self.tags = os.environ['SHELL_SINK_TAGS']
 
   def verify_environment(self):
     if not os.environ.has_key('HOME'):
       raise Exception, "HOME environment variable must be set"
     if not os.environ.has_key('SHELL_SINK_ID'):
       raise Exception, "SHELL_SINK_ID environment variable must be set"
-    if not os.environ.has_key('FAUCET_TAGS'):
-      raise Exception, "FAUCET_TAGS can be empty but must exist"
+    if not os.environ.has_key('SHELL_SINK_TAGS'):
+      raise Exception, "SHELL_SINK_TAGS can be empty but must exist"
 
   def url_with_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history(), 'tags' : self.tags}
