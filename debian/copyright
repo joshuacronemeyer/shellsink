@@ -1,0 +1,19 @@
+This package was debianized by qa <joshuacronemeyer@shellsink.com> on
+Mon, 22 Dec 2008 20:37:24 -0800.
+
+It was downloaded from https://code.launchpad.net/shellsink
+
+Upstream Author(s): 
+
+    joshuacronemeyer@shellsink.com
+
+Copyright: 
+
+    <Copyright (C) 2008 Josh Cronemeyer>
+
+License:
+
+    GNU GPL v3
+
+The Debian packaging is (C) 2008, qa <joshuacronemeyer@shellsink.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
