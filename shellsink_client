@@ -7,8 +7,8 @@ import sys
 import os
 
 SOCKET_TIMEOUT=10
-URL="http://localhost:8080/history/add"
-#URL="http://bash-history.appspot.com/history/add"
+#URL="http://localhost:8080/history/add"
+URL="http://history.shellsink.com/history/add"
 
 class Client:
   def __init__(self):
