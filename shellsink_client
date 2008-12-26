@@ -21,9 +21,9 @@ class Client:
     
     self.history_file = os.environ['HOME'] + "/.bash_history"
     self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
-    self.config = os.environ['HOME'] + "/.faucet"
-    self.config_file = os.environ['HOME'] + "/.faucet/config"
-    self.disable_slug = os.environ['HOME'] + "/.faucet/disable_slug"
+    self.config = os.environ['HOME'] + "/.shellsink"
+    self.config_file = os.environ['HOME'] + "/.shellsink/config"
+    self.disable_slug = os.environ['HOME'] + "/.shellsink/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
     self.tags = os.environ['SHELL_SINK_TAGS']
 
@@ -90,7 +90,7 @@ class Client:
     return not os.path.exists(self.disable_slug)
 
   def conf(self):
-    base = ["""#faucet, a client for remote archiving your shell history"""]
+    base = ["""#shellsink_client, a client for remote archiving your shell history"""]
     if not os.path.exists(self.config):
       os.mkdir(self.config)
     if not os.path.exists(self.config_file):
@@ -108,7 +108,7 @@ def http_get(url):
     pass
 
 def usage():
-  print """usage: faucet [hed] [help|enable|disable]"""
+  print """usage: shellsink_client [hed] [help|enable|disable]"""
 
 def main():
   try:
