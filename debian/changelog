@@ -1,6 +1,6 @@
-shellsink (0.1-1) hardy intrepid; urgency=low
+shellsink (0.1-1) hardy; urgency=low
 
   * Initial release
 
- -- qa <joshuacronemeyer@shellsink.com>  Mon, 22 Dec 2008 20:37:24 -0800
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Mon, 22 Dec 2008 20:37:24 -0800
 

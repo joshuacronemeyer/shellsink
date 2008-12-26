@@ -1,12 +1,12 @@
 Source: shellsink
 Section: utils
 Priority: extra
-Maintainer: josh <joshuacronemeyer@shellsink.com>
-Build-Depends: debhelper (>= 5)
-Standards-Version: 3.7.2
+Maintainer: Josh Cronemeyer <joshuacronemeyer@shellsink.com>
+Build-Depends: python (>=2.4), debhelper (>= 5)
+Standards-Version: 3.7.3
 
 Package: shellsink
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: python (>=2.4), ${shlibs:Depends}, ${misc:Depends}
 Description: Client for logging bash history to shellsink.com
- Client for logging bash history to shellsink.com
+ Shellsink is a client for logging bash history to shellsink.com

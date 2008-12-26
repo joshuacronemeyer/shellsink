@@ -33,12 +33,7 @@ build-stamp: configure-stamp
 
 clean:
 	dh_testdir
-	dh_testroot
 	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
-
 	dh_clean 
 
 install: build
@@ -48,7 +43,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/shellsink.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/shellsink install
+	$(MAKE) DESTDIR=$(DESTDIR) COMPILE=--no-compile install
 
 
 # Build architecture-independent files here.
