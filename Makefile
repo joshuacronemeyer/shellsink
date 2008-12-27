@@ -1,6 +1,5 @@
 # $Id: Makefile,v 1.6 2008/12/26 01:01:35 josh Exp $
 #
-
 PYTHON=`which python`
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/shellsink
@@ -19,8 +18,15 @@ builddeb:
 		mkdir -p ${BUILDIR}
 		DESTDIR=$(BUILDIR) dpkg-buildpackage -rfakeroot
 
+buildsrc:
+		tar czf shellsink_$(VERSION).orig.tar.gz debian shellsink_client
+		mkdir build
+		tar -C build -xzf shellsink_$(VERSION).orig.tar.gz
+		cd $(CURDIR)/build; debuild -S
+
 clean:
 		$(PYTHON) setup.py clean
 		$(MAKE) -f $(CURDIR)/debian/rules clean
 		rm -rf build/ MANIFEST
+		rm -rf shellsink_0*
 		find . -name '*.pyc' -delete
