@@ -4,7 +4,7 @@ PYTHON=`which python`
 DESTDIR=/
 BUILDIR=$(CURDIR)/debian/shellsink
 PROJECT=shellsink
-VERSION=0.1.1
+VERSION=0.1.2
 
 all:
 		@echo "make install - Install on local system"
@@ -19,7 +19,7 @@ builddeb:
 		DESTDIR=$(BUILDIR) dpkg-buildpackage -rfakeroot
 
 buildsrc:
-		tar czf shellsink_$(VERSION).orig.tar.gz debian shellsink-client
+		tar czf shellsink_$(VERSION).orig.tar.gz debian Makefile shellsink-client
 		mkdir build
 		tar -C build -xzf shellsink_$(VERSION).orig.tar.gz
 		cd $(CURDIR)/build; debuild -S

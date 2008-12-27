@@ -1,4 +1,4 @@
-shellsink (0.1-2) hardy; urgency=low
+shellsink (0.1-3) hardy; urgency=low
 
   [ Josh Cronemeyer ]
   * Initial release
@@ -9,4 +9,7 @@ shellsink (0.1-2) hardy; urgency=low
   [ Josh Cronemeyer ]
   * hoping to fix build errors in launchpad
 
- -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Fri, 26 Dec 2008 20:20:37 -0800
+  [ Josh Cronemeyer]
+  * adding makefile to build.  I think that will fix launchpad problems
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Fri, 26 Dec 2008 20:43:57 -0800
