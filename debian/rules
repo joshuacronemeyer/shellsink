@@ -43,7 +43,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/shellsink.
-	$(MAKE) DESTDIR=$(DESTDIR) COMPILE=--no-compile install
+	$(MAKE) DESTDIR=$(shell pwd)/debian/shellsink COMPILE=--no-compile install
 
 
 # Build architecture-independent files here.
