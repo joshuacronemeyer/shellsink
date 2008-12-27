@@ -8,5 +8,5 @@ setup(name = "shellsink",
     author = "Josh Cronemeyer",
     author_email = "joshuacronemeyer@shellsink.com",
     url = "http://shellsink.com",
-    data_files = [('/usr/bin', ['shellsink_client'])]
+    data_files = [('/usr/bin', ['shellsink-client'])]
     )

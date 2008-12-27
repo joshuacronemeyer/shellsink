@@ -90,7 +90,7 @@ class Client:
     return not os.path.exists(self.disable_slug)
 
   def conf(self):
-    base = ["""#shellsink_client, a client for remote archiving your shell history"""]
+    base = ["""#shellsink-client, a client for remote archiving your shell history"""]
     if not os.path.exists(self.config):
       os.mkdir(self.config)
     if not os.path.exists(self.config_file):
@@ -108,7 +108,7 @@ def http_get(url):
     pass
 
 def usage():
-  print """usage: shellsink_client [hed] [help|enable|disable]"""
+  print """usage: shellsink-client [hed] [help|enable|disable]"""
 
 def main():
   try:
