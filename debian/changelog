@@ -1,4 +1,4 @@
-shellsink (0.1-1) hardy; urgency=low
+shellsink (0.1-2) hardy; urgency=low
 
   [ Josh Cronemeyer ]
   * Initial release
@@ -6,4 +6,7 @@ shellsink (0.1-1) hardy; urgency=low
   [ Josh Cronemeyer ]
   * changed the name of the binary
 
- -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Fri, 26 Dec 2008 19:23:23 -0800
+  [ Josh Cronemeyer ]
+  * hoping to fix build errors in launchpad
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Fri, 26 Dec 2008 20:20:37 -0800
