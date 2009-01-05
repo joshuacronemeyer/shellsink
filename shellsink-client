@@ -12,13 +12,7 @@ URL="http://history.shellsink.com/history/add"
 
 class Client:
   def __init__(self):
-    if not os.environ.has_key('HOME'):
-      raise Exception, "HOME environment variable must be set"
-    if not os.environ.has_key('SHELL_SINK_ID'):
-      raise Exception, "SHELL_SINK_ID environment variable must be set"
-    if not os.environ.has_key('SHELL_SINK_TAGS'):
-      raise Exception, "SHELL_SINK_TAGS can be empty but must exist"
-    
+    verify_environment()
     self.history_file = os.environ['HOME'] + "/.bash_history"
     self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
     self.config = os.environ['HOME'] + "/.shellsink"
@@ -101,18 +95,50 @@ class Client:
     self.config = file.readlines()
     file.close()
 
+  def pull(self, tag, keyword):
+    # TODO now i need to set this up on the server so I have a URL to pull from.
+    # pull new history to a file
+    # backup bash_history file
+    # replace bash_history file with new file
+    # call history -r
+    # put old bash_history back in place
+    pass
+
+
 def http_get(url):
   try:
     urllib2.urlopen(url)
   except:
     pass
 
+def get_tag(opts):
+  for opt in opts:
+    if opt[0] in ["-t", "--tag"]:
+      return opt[1]
+  return None
+
+def get_keyword(opts):
+  for opt in opts:
+    if opt[0] in ["-k", "--keyword"]:
+      return opt[1]
+  return None
+
+def verify_environment():
+  if not os.environ.has_key('HOME'):
+    raise Exception, "HOME environment variable must be set"
+  if not os.environ.has_key('SHELL_SINK_ID'):
+    raise Exception, "SHELL_SINK_ID environment variable must be set"
+  if not os.environ.has_key('SHELL_SINK_TAGS'):
+    raise Exception, "SHELL_SINK_TAGS can be empty but must exist"
+
 def usage():
-  print """usage: shellsink-client [hed] [help|enable|disable]"""
+  print """usage: shellsink-client [ -h|-e|-d|-p [ -t TAG|-k KEYWORD ] ] | [ --help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD ] ]
+  When using the pull option empty quotes will pull the most recent commands into your shell history,
+  specifying a TAG string will pull the most recent commands """
 
 def main():
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hed", ["help", "enable", "disable"])
+    opts, args = getopt.getopt(sys.argv[1:], "hedpt:k:", ["help", "enable", "disable", "pull", "tag=", "keyword="])
   except getopt.GetoptError, err:
     # print help information and exit:
     print str(err) # will print something like "option -a not recognized"
@@ -130,6 +156,11 @@ def main():
       sys.exit(0)
     elif o in ("-d", "--disable"):
       client.disable()
+      sys.exit(0)
+    elif o in ("-p", "--pull"):
+      tag = get_tag(opts)
+      keyword = get_keyword(opts)
+      client.pull(tag, keyword)
       sys.exit(0)
     else:
       assert False, "unhandled option"

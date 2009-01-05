@@ -1,23 +1,21 @@
 import unittest
-from shellsink_client import Client
+from shellsink_client import *
 from mock import Mock
 import os
 
 class TestShellSinkClient(unittest.TestCase):
 
   def test_home_env_variable_required(self):
-    client = StubClient()
     os.environ = {'SHELL_SINK_ID' : None}
-    self.assertRaises(Exception, client.verify_environment)
+    self.assertRaises(Exception, verify_environment)
 
   def test_id_env_variable_required(self):
-    client = StubClient()
     os.environ = {'HOME' : None}
-    self.assertRaises(Exception, client.verify_environment)
+    self.assertRaises(Exception, verify_environment)
 
   def test_url_is_correct(self):
     client = StubClient()
-    url_hash = {'id': "1234", 'url': "http://localhost:8080/history/add?", "tags": "abc"}
+    url_hash = {'id': "1234", 'url': "http://history.shellsink.com/history/add?", "tags": "abc"}
     client.id, client.URL, client.tags = url_hash['id'], url_hash['url'], url_hash['tags']
     correct_url = "%(url)scommand=the+latest+command&hash=%(id)s&tags=%(tags)s" % url_hash
     self.assertEqual(client.url_with_command(), correct_url)
@@ -46,6 +44,26 @@ class TestShellSinkClient(unittest.TestCase):
     client.old_time = 2
     client.send_command()
     self.assertEquals(False, client.spawned)
+
+  def test_get_tag_returns_none_when_there_is_no_tag(self):
+    opts = [("-p",None)]
+    self.assertEquals(None, get_tag(opts))
+    
+  def test_get_tag_returns_tag_when_there_is_a_tag(self):
+    opts = [("-p",None),("-t","mytag")]
+    self.assertEquals("mytag", get_tag(opts))
+    opts = [("-p",None),("--tag","mytag")]
+    self.assertEquals("mytag", get_tag(opts))
+
+  def test_get_keyword_returns_none_when_there_is_no_keyword(self):
+    opts = [("-p",None)]
+    self.assertEquals(None, get_keyword(opts))
+    
+  def test_get_tag_returns_keyword_when_there_is_a_keyword(self):
+    opts = [("-p",None),("-k","mykeyword")]
+    self.assertEquals("mykeyword", get_keyword(opts))
+    opts = [("-p",None),("--keyword","mykeyword")]
+    self.assertEquals("mykeyword", get_keyword(opts))
 
 class StubClient(Client):
 
