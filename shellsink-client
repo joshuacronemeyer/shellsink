@@ -7,8 +7,8 @@ import sys
 import os
 
 SOCKET_TIMEOUT=10
-#BASE_URL="http://history.shellsink.com"
-BASE_URL="http://localhost:8080"
+BASE_URL="http://history.shellsink.com"
+#BASE_URL="http://localhost:8080"
 SEND_URL=BASE_URL + "/history/add"
 PULL_URL=BASE_URL + "/pull"
 
