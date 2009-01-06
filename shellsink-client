@@ -5,15 +5,19 @@ import socket
 import getopt
 import sys
 import os
+import shutil
 
 SOCKET_TIMEOUT=10
-#URL="http://localhost:8080/history/add"
-URL="http://history.shellsink.com/history/add"
+#BASE_URL="http://history.shellsink.com"
+BASE_URL="http://localhost:8080"
+SEND_URL=BASE_URL + "/history/add"
+PULL_URL=BASE_URL + "/pull"
 
 class Client:
   def __init__(self):
     verify_environment()
     self.history_file = os.environ['HOME'] + "/.bash_history"
+    self.history_file_backup = os.environ['HOME'] + "/.bash_history.bak"
     self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
     self.config = os.environ['HOME'] + "/.shellsink"
     self.config_file = os.environ['HOME'] + "/.shellsink/config"
@@ -24,12 +28,19 @@ class Client:
   def url_with_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history(), 'tags' : self.tags}
     data = urllib.urlencode(params)
-    return URL + '?' + data
+    return SEND_URL + '?' + data
 
   def send_command(self):
     if self.has_new_command():
       self.spawn_process(http_get, self.url_with_command())
-    
+  
+  def get_history(self):
+    params = {'hash': self.id}
+    data = urllib.urlencode(params)
+    response = http_get(PULL_URL + '?' + data)
+    commands = response.read().split('<shellsink-commands>')[1]
+    return commands.split('</shellsink-commands>')[0].lstrip().rstrip()
+
   def spawn_process(self, func, arg):
     pid = os.fork()
     if pid > 0:
@@ -96,18 +107,14 @@ class Client:
     file.close()
 
   def pull(self, tag, keyword):
-    # TODO now i need to set this up on the server so I have a URL to pull from.
-    # pull new history to a file
-    # backup bash_history file
-    # replace bash_history file with new file
-    # call history -r
-    # put old bash_history back in place
-    pass
-
+    history_content = self.get_history()
+    file = open(self.history_file, "a")
+    file.writelines(history_content)
+    file.close()
 
 def http_get(url):
   try:
-    urllib2.urlopen(url)
+    return urllib2.urlopen(url)
   except:
     pass
 
@@ -161,6 +168,7 @@ def main():
       tag = get_tag(opts)
       keyword = get_keyword(opts)
       client.pull(tag, keyword)
+      print "History file updated.  Execute 'history -n' to add the commands to your current bash session."
       sys.exit(0)
     else:
       assert False, "unhandled option"
