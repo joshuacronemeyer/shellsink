@@ -22,6 +22,7 @@ class Client:
     self.disable_slug = os.environ['HOME'] + "/.shellsink/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
     self.tags = os.environ['SHELL_SINK_TAGS']
+    self.verbose = False
 
   def url_with_send_command(self):
     params = {'hash' : self.id, 'command' : self.latest_from_history(), 'tags' : self.tags}
@@ -42,6 +43,8 @@ class Client:
       self.spawn_process(http_get, self.url_with_send_command())
   
   def get_history(self):
+    if self.verbose:
+      print "Attempt HTTP GET with " + self.url_with_pull_command()
     response = http_get(self.url_with_pull_command())
     commands = response.read()
     if commands.find('<shellsink-commands>') < 0:
@@ -121,8 +124,12 @@ class Client:
 
   def pull(self):
     history_content = self.get_history()
+    if self.verbose:
+      print 'ShellSink Commands Pulled From Server:'
+      print history_content
+      print ''
     file = open(self.history_file, "a")
-    file.writelines(history_content)
+    file.writelines(history_content + "\n")
     file.close()
 
 def http_get(url):
@@ -143,6 +150,12 @@ def get_keyword(opts):
       return opt[1]
   return None
 
+def is_verbose(opts):
+  for opt in opts:
+    if opt[0] in ["-v", "--verbose"]:
+      return True
+  return False
+
 def verify_environment():
   if not os.environ.has_key('HOME'):
     raise Exception, "HOME environment variable must be set"
@@ -152,13 +165,12 @@ def verify_environment():
     raise Exception, "SHELL_SINK_TAGS can be empty but must exist"
 
 def usage():
-  print """usage: shellsink-client [ -h|-e|-d|-p [ -t TAG|-k KEYWORD ] ] | [ --help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD ] ]
-  When using the pull option empty quotes will pull the most recent commands into your shell history,
-  specifying a TAG string will pull the most recent commands """
+  print """usage: shellsink-client [ -h|-e|-d|-p [ -t TAG|-k KEYWORD|-v ] ] | [ --help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD|--verbose ] ]
+  The pull option pulls the most recent commands from the server into your history.  Specifying a tag or keyword along with the pull command will pull the most recent commands matching that tag or keyword into your history.  You cannot combine tags and keywords in your search.  The verbose option will output commands that were returned by the pull operation to standard out."""
 
 def main():
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hedpt:k:", ["help", "enable", "disable", "pull", "tag=", "keyword="])
+    opts, args = getopt.getopt(sys.argv[1:], "hedpt:k:v", ["help", "enable", "disable", "pull", "tag=", "keyword=", "verbose"])
   except getopt.GetoptError, err:
     # print help information and exit:
     print str(err) # will print something like "option -a not recognized"
@@ -180,6 +192,8 @@ def main():
     elif o in ("-p", "--pull"):
       client.tag = get_tag(opts)
       client.keyword = get_keyword(opts)
+      if is_verbose(opts):
+        client.verbose = True
       client.pull()
       print "History file updated.  Execute 'history -r' to add the commands to your current bash session."
       sys.exit(0)
