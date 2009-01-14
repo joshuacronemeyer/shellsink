@@ -13,12 +13,17 @@ class TestShellSinkClient(unittest.TestCase):
     os.environ = {'HOME' : None}
     self.assertRaises(Exception, verify_environment)
 
-  def test_url_is_correct(self):
+  def test_url_of_send_command_is_correct(self):
     client = StubClient()
-    url_hash = {'id': "1234", 'url': "http://history.shellsink.com/history/add?", "tags": "abc"}
-    client.id, client.URL, client.tags = url_hash['id'], url_hash['url'], url_hash['tags']
-    correct_url = "%(url)scommand=the+latest+command&hash=%(id)s&tags=%(tags)s" % url_hash
+    url_hash = {'id': "1234", 'url': "http://history.shellsink.com/addCommand?"}
+    client.id, client.URL = url_hash['id'], url_hash['url']
+    correct_url = "%(url)scommand=the+latest+command&hash=%(id)s" % url_hash
     self.assertEqual(client.url_with_send_command(), correct_url)
+
+  def test_url_of_send_tag_is_correct(self):
+    client = StubClient()
+    correct_url = "http://history.shellsink.com/addTag?tag=abc&command=1234"
+    self.assertEqual(client.url_with_send_tag('abc', '1234'), correct_url)
 
   def test_new_command_is_detected_when_timestamp_is_newer(self):
     client = StubClient()

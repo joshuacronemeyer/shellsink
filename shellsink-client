@@ -9,7 +9,8 @@ import os
 SOCKET_TIMEOUT=10
 BASE_URL="http://history.shellsink.com"
 #BASE_URL="http://localhost:8080"
-SEND_URL=BASE_URL + "/history/add"
+SEND_URL=BASE_URL + "/addCommand"
+SEND_TAG_URL=BASE_URL + "/addTag"
 PULL_URL=BASE_URL + "/pull"
 
 class Client:
@@ -25,9 +26,14 @@ class Client:
     self.verbose = False
 
   def url_with_send_command(self):
-    params = {'hash' : self.id, 'command' : self.latest_from_history(), 'tags' : self.tags}
+    params = {'hash' : self.id, 'command' : self.latest_from_history()}
     data = urllib.urlencode(params)
     return SEND_URL + '?' + data
+  
+  def url_with_send_tag(self, tag, command_id):
+    params = {'command' : command_id, 'tag' : tag}
+    data = urllib.urlencode(params)
+    return SEND_TAG_URL + '?' + data
 
   def url_with_pull_command(self):
     params = {'hash': self.id}
@@ -37,10 +43,17 @@ class Client:
       params['keyword'] = self.keyword
     data = urllib.urlencode(params)
     return PULL_URL + '?' + data
+  
+  def async_sending_of_command_and_tags(self, tags):
+    response = http_get(self.url_with_send_command())
+    command_id = response.readline().strip()
+    the_tags = tags.split(":")
+    for tag in the_tags:
+      http_get(self.url_with_send_tag(tag, command_id))
 
   def send_command(self):
     if self.has_new_command():
-      self.spawn_process(http_get, self.url_with_send_command())
+      response = self.spawn_process(self.async_sending_of_command_and_tags, self.tags)
   
   def get_history(self):
     if self.verbose:
