@@ -46,10 +46,11 @@ class Client:
   
   def async_sending_of_command_and_tags(self, tags):
     response = http_get(self.url_with_send_command())
-    command_id = response.readline().strip()
-    the_tags = tags.split(":")
-    for tag in the_tags:
-      http_get(self.url_with_send_tag(tag, command_id))
+    if response:
+      command_id = response.readline().strip()
+      the_tags = tags.split(":")
+      for tag in the_tags:
+        http_get(self.url_with_send_tag(tag, command_id))
 
   def send_command(self):
     if self.has_new_command():
