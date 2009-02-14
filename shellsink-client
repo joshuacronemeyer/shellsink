@@ -5,6 +5,8 @@ import socket
 import getopt
 import sys
 import os
+import logging, logging.handlers
+import traceback
 
 SOCKET_TIMEOUT=10
 BASE_URL="http://history.shellsink.com"
@@ -95,12 +97,13 @@ class Client:
     return os.path.getmtime(self.history_file)
 
   def last_recorded_history_timestamp(self):
-    if os.path.exists(self.history_timestamp):
+    try:
       file = open(self.history_timestamp,"r")
-      old_history_timestamp = float(file.readline())
+      return float(file.readline())
+    except:
+      return None
+    finally:
       file.close()
-      return old_history_timestamp
-    return None
 
   def record_new_last_recorded_history_timestamp(self, timestamp):
     file = open(self.history_timestamp,"w")
@@ -147,10 +150,20 @@ class Client:
     file.close()
 
 def http_get(url):
+  response = None
   try:
-    return urllib2.urlopen(url)
+    response = urllib2.urlopen(url)
+  except urllib2.HTTPError, e:
+    logger.error("Shellsink recieved an error from the server: %d" % e.code)
+    if e.code == 404:
+      logger.error("Ensure the env variable SHELL_SINK_ID is set to the unique id found here: %s%s"
+        % (BASE_URL, "/preferences"))
+  except urllib2.URLError, e:
+    logger.error("Shellsink unable to contact server at %s. Reason: %s" % (url, e.reason))
   except:
-    pass
+    logger.error("Shellsink cannot establish HTTP connection.  Your message was not sent.")
+  
+  return response
 
 def get_tag(opts):
   for opt in opts:
@@ -177,6 +190,20 @@ def verify_environment():
     raise Exception, "SHELL_SINK_ID environment variable must be set"
   if not os.environ.has_key('SHELL_SINK_TAGS'):
     raise Exception, "SHELL_SINK_TAGS can be empty but must exist"
+
+def logger():
+  if sys.platform == "darwin":
+    # Apple made 10.5 more secure and annoying by disabling network syslog:
+    address = "/var/run/syslog"
+  else:
+    address = ('localhost', 514)
+
+  hdlr = logging.handlers.SysLogHandler(address)
+  logger = logging.getLogger("shellsink")
+  formatter = logging.Formatter('%(filename)s: %(levelname)s: %(message)s')
+  hdlr.setFormatter(formatter)
+  logger.addHandler(hdlr)
+  return logger
 
 def usage():
   print """usage: shellsink-client [ -h|-e|-d|-p [ -t TAG|-k KEYWORD|-v ] ] | [ --help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD|--verbose ] ]
@@ -219,6 +246,9 @@ def main():
     client.send_command()
 
 if __name__== '__main__':
-  main()
-
-
+  logger = logger()
+  try:
+    main()
+  except Exception:
+    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+    logger.error(''.join(traceback.format_tb(exceptionTraceback)))
