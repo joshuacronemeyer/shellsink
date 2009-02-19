@@ -25,30 +25,25 @@ class TestShellSinkClient(unittest.TestCase):
     correct_url = "http://history.shellsink.com/addTag?tag=abc&command=1234"
     self.assertEqual(client.url_with_send_tag('abc', '1234'), correct_url)
 
-  def test_new_command_is_detected_when_timestamp_is_newer(self):
-    client = StubClient()
-    client.new_time = 2
-    client.old_time = 1
-    self.assertEqual(True, client.has_new_command())
-
-  def test_new_command_is_not_detected_when_timestamp_is_older(self):
-    client = StubClient()
-    client.new_time = 1
-    client.old_time = 2
-    self.assertEqual(False, client.has_new_command())
-
-  def test_new_command_is_detected_when_no_previous_timestamp_existed(self):
-    client = StubClient()
-    client.new_time = 1
-    client.old_time = None
-    self.assertEqual(True, client.has_new_command())
-
   def test_nothing_happens_if_no_new_command(self):
     client = StubClient()
-    client.new_time = 1
-    client.old_time = 2
+    mock = Mock()
+    def has_new_command():
+      return False
+    mock.has_new_command = has_new_command
+    client.history = mock
     client.send_command()
     self.assertEquals(False, client.spawned)
+  
+  def test_http_process_spawned_if_new_command(self):
+    client = StubClient()
+    mock = Mock()
+    def has_new_command():
+      return True
+    mock.has_new_command = has_new_command
+    client.history = mock
+    client.send_command()
+    self.assertEquals(True, client.spawned)
 
   def test_get_tag_returns_none_when_there_is_no_tag(self):
     opts = [("-p",None)]
@@ -74,22 +69,19 @@ class StubClient(Client):
 
   def __init__(self):
     self.spawned = False
+    self.tags = []
+    mock = Mock()
+    def latest():
+      return "the latest command"
+    mock.latest = latest
+    self.history = mock
     pass
-
-  def latest_from_history(self):
-    return "the latest command"
-
-  def history_file_timestamp(self):
-    return self.new_time
-
-  def last_recorded_history_timestamp(self):
-    return self.old_time
-
-  def record_new_last_recorded_history_timestamp(self, timestamp):
-    pass
-
+  
   def spawn_process(self, func, arg):
     self.spawned = True
+
+  def async_sending_of_command_and_tags(self):
+    pass
   
 
 if __name__ == '__main__':

@@ -18,17 +18,16 @@ PULL_URL=BASE_URL + "/pull"
 class Client:
   def __init__(self):
     verify_environment()
-    self.history_file = os.environ['HOME'] + "/.bash_history"
-    self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
     self.config = os.environ['HOME'] + "/.shellsink"
     self.config_file = os.environ['HOME'] + "/.shellsink/config"
     self.disable_slug = os.environ['HOME'] + "/.shellsink/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
     self.tags = os.environ['SHELL_SINK_TAGS']
     self.verbose = False
+    self.history = HistoryFile()
 
   def url_with_send_command(self):
-    params = {'hash' : self.id, 'command' : self.latest_from_history()}
+    params = {'hash' : self.id, 'command' : self.history.latest()}
     data = urllib.urlencode(params)
     return SEND_URL + '?' + data
   
@@ -55,7 +54,7 @@ class Client:
         http_get(self.url_with_send_tag(tag, command_id))
 
   def send_command(self):
-    if self.has_new_command():
+    if self.history.has_new_command():
       response = self.spawn_process(self.async_sending_of_command_and_tags, self.tags)
   
   def get_history(self):
@@ -82,39 +81,6 @@ class Client:
     if pid > 0:
       sys.exit(0)
     func(arg)
-
-  def has_new_command(self):
-    new_history_timestamp = self.history_file_timestamp()
-    timestamp_if_there_is_no_last_recorded = new_history_timestamp - 1
-    last_recorded_history_timestamp = self.last_recorded_history_timestamp()
-    if not last_recorded_history_timestamp:
-      last_recorded_history_timestamp = timestamp_if_there_is_no_last_recorded
-
-    self.record_new_last_recorded_history_timestamp(new_history_timestamp)
-    return new_history_timestamp > last_recorded_history_timestamp
-
-  def history_file_timestamp(self):
-    return os.path.getmtime(self.history_file)
-
-  def last_recorded_history_timestamp(self):
-    try:
-      file = open(self.history_timestamp,"r")
-      return float(file.readline())
-    except:
-      return None
-    finally:
-      file.close()
-
-  def record_new_last_recorded_history_timestamp(self, timestamp):
-    file = open(self.history_timestamp,"w")
-    file.writelines([str(timestamp)])
-    file.close()
-
-  def latest_from_history(self):
-    file = open(self.history_file, "r")
-    latest = file.readlines()[-1]
-    file.close()
-    return latest
 
   def enable(self):
     if os.path.exists(self.disable_slug):
@@ -145,9 +111,54 @@ class Client:
       print 'ShellSink Commands Pulled From Server:'
       print history_content
       print ''
-    file = open(self.history_file, "a")
-    file.writelines(history_content + "\n")
+    self.history.add(history_content)
+    
+class HistoryFile:
+  def __init__(self):
+    self.history_file = os.environ['HOME'] + "/.bash_history"
+    self.history_timestamp = os.environ['HOME'] + "/.bash_history_timestamp"
+  
+  def has_new_command(self):
+    new_history_timestamp = self.history_file_timestamp()
+    timestamp_if_there_is_no_last_recorded = new_history_timestamp - 1
+    last_recorded_history_timestamp = self.last_recorded_history_timestamp()
+    if not last_recorded_history_timestamp:
+      last_recorded_history_timestamp = timestamp_if_there_is_no_last_recorded
+
+    self.record_new_last_recorded_history_timestamp(new_history_timestamp)
+    return new_history_timestamp > last_recorded_history_timestamp
+
+  def history_file_timestamp(self):
+    return os.path.getmtime(self.history_file)
+
+  def last_recorded_history_timestamp(self):
+    try:
+      file = open(self.history_timestamp,"r")
+      return float(file.readline())
+    except:
+      return None
+    finally:
+      file.close()
+
+  def record_new_last_recorded_history_timestamp(self, timestamp):
+    file = open(self.history_timestamp,"w")
+    file.writelines([str(timestamp)])
     file.close()
+
+  def latest(self):
+    try:
+      file = open(self.history_file, "r")
+      latest = file.readlines()[-1]
+    finally:
+      file.close()
+    return latest
+
+  def add(self, commands):
+    try:
+      file = open(self.history_file, "a")
+      file.writelines(commands + "\n")
+    finally:
+      file.close()
 
 def http_get(url):
   response = None
