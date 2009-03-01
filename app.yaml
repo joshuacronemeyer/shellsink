@@ -1,0 +1,38 @@
+application: shell-sink
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /images
+  static_dir: images
+
+- url: /stylesheets
+  static_dir: stylesheets
+
+- url: /js
+  static_dir: js
+
+- url: /favicon.ico
+  static_files: images/favicon.ico
+  upload: images/favicon.ico
+
+- url: /addCommand*
+  script: shellsink.py
+
+- url: /addTag*
+  script: shellsink.py
+
+- url: /atom*
+  script: shellsink.py
+
+- url: /pull*
+  script: shellsink.py
+
+- url: /shellsink.gpg
+  static_files: html/shellsink.gpg
+  upload: html/shellsink.gpg
+
+- url: /.*
+  login: required
+  script: shellsink.py

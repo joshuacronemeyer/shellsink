@@ -1,0 +1,135 @@
+.align-right
+{
+  position: absolute;
+  right: 0.5cm;
+  width: 50%;
+  text-align: right;
+}
+
+.sidebar
+{
+  float: right;
+  padding-right: 2cm;
+}
+
+.bottom-border 
+{
+  border-bottom: thin solid black;
+  padding-bottom: 0.2cm;
+  background: white;
+}
+
+.command-heading
+{
+  padding-top: 0.5cm;
+  padding-bottom: 0.3cm;
+  padding-left: 0.5cm;
+  padding-right: 0.5cm;
+}
+
+.red-heading
+{
+  font-weight: bold;
+  color: black;
+}
+
+.command
+{
+  padding-left: 0.5cm;
+  padding-top: 0.3cm;
+  padding-right: 0.5cm;
+  padding-bottom: 0.3cm;
+  width: 80%;
+}
+
+.command-text
+{
+  background-color: #E0E0E0;
+  font-family: courier;
+}
+
+.time
+{
+  color: red;
+  font-size: 80%;
+}
+
+.tag-heading
+{
+  line-height: 180%;
+  font-weight: bold;
+  font-size: 90%;
+}
+
+.page
+{
+  padding-left: 0.5cm;
+  padding-right: 0.5cm;
+  font-weight: bold;
+}
+
+.paging
+{
+  margin-left: 6cm;
+  margin-bottom: 1cm;
+}
+
+.preferences
+{
+  padding-top: 0.5cm;
+  padding-bottom: 0.3cm;
+  padding-left: 0.5cm;
+  padding-right: 0.5cm;
+}
+
+.hash
+{
+  color: red;
+}
+
+.red-warning
+{
+  color: red;
+  font-size: 120%;
+  padding: 0.5cm;
+}
+
+a.red:link {color: red; text-decoration: underline; }
+a.red:active {color: red; text-decoration: underline; }
+a.red:visited {color: red; text-decoration: underline; }
+
+.command-annotation
+{
+  padding-left: 0.5cm;
+  padding-right: 0.5cm;
+  margin-left: 40px;
+  display: inline-table;
+  /*border: thin solid #969696;*/
+  font-size: 80%;
+}
+
+.annotate-img
+{
+  padding-left: 0.2cm;
+}
+
+.center
+{
+  display: table;
+  margin-top: 1cm;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#content
+{
+  margin-left: 1cm;
+}
+
+body 
+{
+  background-image:
+  url('/images/shellsink-plain.jpg');
+  background-repeat: no-repeat;
+  background-position: 50% 200px; 
+}

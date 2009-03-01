@@ -1,0 +1,22 @@
+{% extends "shellsink_base.html" %}
+
+{% block title %}Your Preferences In The Sink{% endblock %}
+
+{% block content %}
+<div class='preferences'>
+  <ul>
+    <li>Your unique id is: <span class='hash'>{{ hash }}</span></li>
+    <li><a href='/atom?user_id={{ key }}'>Here</a> is a link to your atom feed.</li>
+    <li>Disable atom feed: <input id="disable_atom" type="checkbox" name="disable_atom" {% ifequal disable_atom "true" %}checked{%endifequal%} onchange="disableAtomSelect(this, '{{ hash }}');"></li>
+    <li>Filter atom feed by tag: 
+    <select id="filter" onchange="updateFilter('{{ hash }}')" {% ifequal disable_atom "true" %}disabled="true"{%endifequal%}>
+      <option {% ifequal filter "" %}selected='yes'{% endifequal %}></option>
+      {% for tag in tags %}
+      <option {% ifequal tag filter %}selected='yes'{% endifequal %}>{{ tag }}</option>
+      {% endfor %}
+    </select>
+    </li>
+  </ul>
+</div>    
+{% endblock %}
+{% block bottom-ad %}{% endblock %}

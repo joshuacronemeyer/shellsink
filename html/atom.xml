@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ nickname }}'s Private Feed</title>
+  <id>tag:shellsink.com,{{ year }}:/{{ user_id }}</id>
+  <link type="application/atom+xml" rel="self" href="http://shellsink.com/atom?user_id={{ user_id }}"/>
+  <updated>{{ update_time }}</updated>
+  {% for command in commands %}
+  <entry>
+    <id>tag:shellsink.com,{{ year }}:command/{{ command.key }}</id>
+    <published>{{ command.date }}</published>
+    <updated>{{ command.date }}</updated>
+    <link type="text/html" rel="alternate" href="http://history.shellsink.com/showCommand?id={{ command.key|urlencode }}"/>
+    <title>{{ nickname }} executed {{ command.command|truncatewords:2 }}</title>
+    <content type="text">
+      {{ command.command }}
+    </content>
+    <author>
+      <name>{{ nickname }}</name>
+    </author>
+  </entry>
+  {% endfor %}
+</feed>

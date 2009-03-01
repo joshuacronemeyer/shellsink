@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link rel="stylesheet" href="stylesheets/style.css" />
+    <title>{% block title %}Shell Sink{% endblock %}</title>
+    <script type="text/javascript" src="js/prototype-1.6.0.2.js"></script>
+    <script type="text/javascript" src="js/shellsink.js"></script>
+    <meta name="description" content="A site for unix system administrators and power users who want to make their shell history searchable and tagable.">
+    <meta name="keywords" content="unix, sysadmin, shell, ubuntu, linux">
+  </head>
+  
+  <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-731279-4");
+    pageTracker._trackPageview();
+    } catch(err) {}
+  </script>  
+  
+  <body>
+    <div class="bottom-border" id="header">
+      {% block header %}
+      <form action="/commandSearch" method="post">
+        Welcome, {{username}} | 
+        <a href='/history'>History</a> | 
+        <a href='/preferences'>Preferences</a> | 
+        <a href='{{ logout_url }}'>Logout</a>
+        <span class="align-right" id="Search Commands">
+          <span class="time" id="search message"></span>
+          <label for="query">Search Commands</label>
+          <input type="text" name="query" id="query" size="25" value="{{ query }}" onkeyup="limitSearchTerms(this)">
+          <input type="submit" id="querySubmit" Value='search'>
+        </span>
+      </form>
+      {% endblock %}
+    </div>
+
+    <div id="content">
+      <!-- google_ad_section_start -->
+      {% block heading %}{% endblock %}
+      {% block side-ad %}
+      <div class="sidebar">
+        <script type="text/javascript"><!--
+          google_ad_client = "pub-7792420019429120";
+          /* vertical shellsink */
+          google_ad_slot = "0904714546";
+          google_ad_width = 160;
+          google_ad_height = 600;
+          //-->
+        </script>
+        <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+        </script>
+      </div>
+      {% endblock %}
+      {% block content %}{% endblock %}
+      <!-- google_ad_section_end -->
+      <div class="center">
+        {% block paging %}{% endblock %}
+        {% block bottom-ad %}
+        <script type="text/javascript"><!--
+          google_ad_client = "pub-7792420019429120";
+          /* 728x90, created 12/9/08 */
+          google_ad_slot = "4331272466";
+          google_ad_width = 728;
+          google_ad_height = 90;
+          //-->
+        </script>
+        <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+        </script>
+        {% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

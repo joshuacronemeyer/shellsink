@@ -1,0 +1,53 @@
+{% extends "shellsink_base.html" %}
+
+{% block title %}Your Shell History In The Sink{% endblock %}
+
+{% block heading %}
+  <div class="command-heading"><span class='red-heading'>Commands Issued:</span><span class="align-right"></span></div>
+{% endblock %}
+
+{% block content %}
+  {% if no_commands %}
+  <div class="red-warning">
+    shell_sink hasn't recieved any commands from you yet.  Make sure your client is configured correctly.  
+    See <a href='http://shellsink.com/'>here</a> for instructions.
+  </div>
+  {% endif %}
+
+  {% for command in commands %}
+    <div class='command'>
+      <span class='command-text'>{{ command.command|escape }}</span>
+      <img class='annotate-img' src="/images/annotate.png" onclick="editAnnotation({{ forloop.counter }})"/>&nbsp;- 
+      <span class='time'>{{ command.date|timesince }} ago.</span>
+
+      <div id='annotation-block{{ forloop.counter }}'>
+        <div class='command-annotation' id='annotation{{ forloop.counter }}' {% if not command.annotation %}style="display: none;"{% endif %}>{{ command.annotation|escape }}</div>
+        <div style="display: none;" id='annotation-input-div{{ forloop.counter }}'>
+          <textarea id='annotation-input{{ forloop.counter }}' rows='10' cols='80'>{% if command.annotation %}{{ command.annotation }}{% endif %}</textarea>
+          <img src="/images/button.png" onclick="updateAnnotation({{ forloop.counter }})"/>
+        </div>
+      </div>
+
+      <span class='tag-heading'>Tags:</span> <img src='/images/tag.png' onclick="showQuickTag({{ forloop.counter }})"/>
+      <span id='tags{{ forloop.counter }}'>{% for tag in command.tags %}<a href='/showTag?tag={{ tag }}'>{{ tag }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+      <span id='quick-tag{{ forloop.counter }}' style="display: none;">
+        <input type="text" id="tagvalue{{ forloop.counter }}" size="25">
+        <input type="hidden" value="{{ command.key }}" id="id{{ forloop.counter }}">
+        <img src="/images/button.png" onclick="updateTag({{ forloop.counter }})" />
+      </span>
+    </div>
+  {% endfor %}
+
+{% endblock %}
+
+{% block paging %}
+  <div class='paging'>
+    {% if paging_helper.has_prev %}
+    <img src="/images/lt-arrow.png"/><a href='{{ paging_helper.previous_url }}' class='page'>previous</a>
+    {% else %}
+    <img src="/images/lt-arrow.png"/><span class='page'>previous</span>
+    {% endif %}
+    <span class='page'>page {{ paging_helper.page }}</span>
+    <a href='{{ paging_helper.next_url }}' class='page'>next</a><img src="/images/rt-arrow.png"/>
+  </div>    
+{% endblock %}  

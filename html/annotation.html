@@ -1,0 +1,7 @@
+<span id='annotation-block'>
+  <div class='command-annotation' id='annotation' {% if not command.annotation %}style="display: none;"{% endif %}>{{ command.annotation|escape }}</div>
+  <div style="display: none;" id='annotation-input-div'>
+    <textarea id='annotation-input' rows='10' cols='80'>{% if command.annotation %}{{ command.annotation }}{% endif %}</textarea>
+    <img src="/images/button.png" onclick="updateAnnotation()"/>
+  <div>
+</span>

@@ -1,0 +1,20 @@
+#Features to add
+##Commands have an edited on timestamp so that if you annotate the command, the annotation is pushed out to the rss feed again.  Perhaps it should work for tags too?
+##After adding a command make separate requests to add each tag.  This seems less efficient, but should keep google quota nazis happier.  This means adding a command needs to return the id of the command so that it can be used as a parameter in the add tag call.
+##Multi edit of tags...  I was thinking that if you open multiple tag entry fields, whatever you type in one you type in all.  Then when you submit you submit all.
+##Optimize add command time perhaps with entity groups (each account is an entity?) or with transactions and if transactions help you just queue up many commands to post all at once.
+##Add filtering by date for all search types
+##Adding comma separated list of tags should work
+##Add an about screen that is also shown when there are no commands
+##Add client side method to figure out what command was issued from a list of commands.  Send that along so a counter can increment on server side. Then figure out how to make a nice graph.
+##Replace offset paging with filter by timestamp paging becuase offset paging is inefficient and only works up to 1000 results.
+
+#maintenance to do
+##see what can be factored out in tests
+##Need to setup a proper main script that pulls everything in, has all the routes, etc.  That will let me put all python into a src tree.
+
+#bugs
+##found a bug... i get duplicate commands by starting and quiting my terminal
+##i think the client app should be renamed faucet
+##need to truncate to make sure commands over 500 characters can't get in there
+##multiline text doesn't look multi line
