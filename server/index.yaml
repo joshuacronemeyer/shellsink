@@ -27,14 +27,14 @@ indexes:
   - name: date
     direction: desc
 
-# Used once in query history.
+# Used 12 times in query history.
 - kind: Command
   properties:
   - name: user
   - name: date
     direction: desc
 
-# Unused in query history -- copied from input.
+# Used once in query history.
 - kind: CommandTag
   properties:
   - name: tag
