@@ -1,4 +1,5 @@
 #Shell Sink
+#See http://shell-sink.blogspot.com/2008/12/installing-shellsink-client-application.html for installation instructions.
 shopt -s histappend
 export SHELL_SINK_COMMAND=shellsink-client
 export SHELL_SINK_ID=your-hex-id

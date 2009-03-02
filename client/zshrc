@@ -1,3 +1,5 @@
+#Shellsink
+#See http://shell-sink.blogspot.com/2008/12/installing-shellsink-client-application.html for installation instructions.
 # number of lines kept in history
 export HISTSIZE=1000
 # number of lines saved in the history after logout
