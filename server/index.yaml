@@ -27,7 +27,7 @@ indexes:
   - name: date
     direction: desc
 
-# Used 12 times in query history.
+# Used 13 times in query history.
 - kind: Command
   properties:
   - name: user
