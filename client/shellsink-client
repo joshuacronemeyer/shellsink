@@ -156,8 +156,6 @@ class HistoryFile:
       return float(file.readline())
     except:
       return None
-    finally:
-      file.close()
 
   def record_new_last_recorded_history_timestamp(self, timestamp):
     file = open(self.history_timestamp,"w")
