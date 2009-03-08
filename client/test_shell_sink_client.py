@@ -92,6 +92,8 @@ class StubClient(Client):
       return "the latest command"
     mock.latest = latest
     self.history = mock
+    self.send_url = "http://history.shellsink.com/addCommand"
+    self.send_tag_url = "http://history.shellsink.com/addTag"
     pass
   
   def spawn_process(self, func, arg):
