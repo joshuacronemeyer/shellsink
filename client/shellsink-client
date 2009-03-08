@@ -25,14 +25,9 @@ import getopt
 import sys
 import os
 import logging, logging.handlers
-import traceback
 
 SOCKET_TIMEOUT=10
 BASE_URL="http://history.shellsink.com"
-#BASE_URL="http://localhost:8080"
-SEND_URL=BASE_URL + "/addCommand"
-SEND_TAG_URL=BASE_URL + "/addTag"
-PULL_URL=BASE_URL + "/pull"
 
 class Client:
   def __init__(self):
@@ -42,18 +37,22 @@ class Client:
     self.disable_slug = os.environ['HOME'] + "/.shellsink/disable_slug"
     self.id = os.environ['SHELL_SINK_ID']
     self.tags = os.environ['SHELL_SINK_TAGS']
+    self.base_url = os.environ.get("SHELL_SINK_URL", BASE_URL)
+    self.send_url = self.base_url + "/addCommand"
+    self.send_tag_url = self.base_url + "/addTag"
+    self.pull_url = self.base_url + "/pull"
     self.verbose = False
     self.history = HistoryFile()
 
   def url_with_send_command(self):
     params = {'hash' : self.id, 'command' : self.history.latest()}
     data = urllib.urlencode(params)
-    return SEND_URL + '?' + data
+    return self.send_url + '?' + data
   
   def url_with_send_tag(self, tag, command_id):
     params = {'command' : command_id, 'tag' : tag}
     data = urllib.urlencode(params)
-    return SEND_TAG_URL + '?' + data
+    return self.send_tag_url + '?' + data
 
   def url_with_pull_command(self):
     params = {'hash': self.id}
@@ -62,15 +61,30 @@ class Client:
     if self.keyword:
       params['keyword'] = self.keyword
     data = urllib.urlencode(params)
-    return PULL_URL + '?' + data
+    return self.pull_url + '?' + data
   
   def async_sending_of_command_and_tags(self, tags):
-    response = http_get(self.url_with_send_command())
+    response = self.http_get(self.url_with_send_command())
     if response:
       command_id = response.readline().strip()
       the_tags = tags.split(":")
       for tag in the_tags:
-        http_get(self.url_with_send_tag(tag, command_id))
+        self.http_get(self.url_with_send_tag(tag, command_id))
+  
+  def http_get(self, url):
+    response = None
+    try:
+      response = urllib2.urlopen(url)
+    except urllib2.HTTPError, e:
+      logger.error("Shellsink recieved an error from the server: %d" % e.code)
+      if e.code == 404:
+        logger.error("Ensure the env variable SHELL_SINK_ID is set to the unique id found here: %s%s" % (self.base_url, "/preferences"))
+    except urllib2.URLError, e:
+      logger.error("Shellsink unable to contact server at %s. Reason: %s" % (url, e.reason))
+    except:
+      logger.error("Shellsink cannot establish HTTP connection.  Your message was not sent.")
+
+    return response
 
   def send_command(self):
     if self.history.has_new_command():
@@ -79,7 +93,7 @@ class Client:
   def get_history(self):
     if self.verbose:
       print "Attempt HTTP GET with " + self.url_with_pull_command()
-    response = http_get(self.url_with_pull_command())
+    response = self.http_get(self.url_with_pull_command())
     commands = response.read()
     if commands.find('<shellsink-commands>') < 0:
       print "Is your SHELL_SINK_ID env variable correct?"
@@ -177,22 +191,6 @@ class HistoryFile:
     finally:
       file.close()
 
-def http_get(url):
-  response = None
-  try:
-    response = urllib2.urlopen(url)
-  except urllib2.HTTPError, e:
-    logger.error("Shellsink recieved an error from the server: %d" % e.code)
-    if e.code == 404:
-      logger.error("Ensure the env variable SHELL_SINK_ID is set to the unique id found here: %s%s"
-        % (BASE_URL, "/preferences"))
-  except urllib2.URLError, e:
-    logger.error("Shellsink unable to contact server at %s. Reason: %s" % (url, e.reason))
-  except:
-    logger.error("Shellsink cannot establish HTTP connection.  Your message was not sent.")
-  
-  return response
-
 def get_tag(opts):
   for opt in opts:
     if opt[0] in ["-t", "--tag"]:
@@ -221,10 +219,9 @@ def verify_environment():
 
 def logger():
   if sys.platform == "darwin":
-    # Apple made 10.5 more secure and annoying by disabling network syslog:
     address = "/var/run/syslog"
   else:
-    address = ('localhost', 514)
+    address = "/dev/log"
 
   hdlr = logging.handlers.SysLogHandler(address)
   logger = logging.getLogger("shellsink")
@@ -277,6 +274,7 @@ if __name__== '__main__':
   logger = logger()
   try:
     main()
-  except Exception:
-    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-    logger.error(''.join(traceback.format_tb(exceptionTraceback)))
+  except SystemExit:
+    pass
+  except Exception, e:
+    logger.error(e)
