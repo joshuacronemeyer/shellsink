@@ -1,3 +1,21 @@
+shellsink (0.1.9) hardy; urgency=low
+
+  * refine new logging stuff so it works right on linux systems with remote
+    logging disabled, and just removed some weird code like the traceback
+    stuff that I was doing.
+
+  * fix bug related to history timestamp file not being created.
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Mon, 23 Mar 2009 22:32:28 -0700
+
+shellsink (0.1.8) hardy; urgency=low
+
+  * add logging to syslog to avoid chatter on command line when there are
+    problems
+  * better logging for user id not found and command id not found from server 
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Mon, 02 Mar 2009 05:33:34 -0800
+
 shellsink (0.1.5) hardy; urgency=low
 
   [ Josh Cronemeyer ]
