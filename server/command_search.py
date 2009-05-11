@@ -230,9 +230,28 @@ class SearchableQuery(datastore.Query):
         filter.set_op(datastore_pb.Query_Filter.EQUAL)
         prop = filter.add_property()
         prop.set_name(SearchableEntity._FULL_TEXT_INDEX_PROPERTY)
+        prop.set_multiple(len(keywords) > 1)
         prop.mutable_value().set_stringvalue(unicode(keyword).encode('utf-8'))
 
     return pb
+
+
+class SearchableMultiQuery(datastore.MultiQuery):
+  """A multiquery that supports Search() by searching subqueries."""
+
+  def Search(self, *args, **kwargs):
+    """Add a search query, by trying to add it to all subqueries.
+
+    Args:
+      args: Passed to Search on each subquery.
+      kwargs: Passed to Search on each subquery.
+
+    Returns:
+      self for consistency with SearchableQuery.
+    """
+    for q in self:
+      q.Search(*args, **kwargs)
+    return self
 
 
 class SearchableModel(db.Model):
@@ -241,7 +260,6 @@ class SearchableModel(db.Model):
   Automatically indexes all string-based properties. To search, use the all()
   method to get a SearchableModel.Query, then use its search() method.
   """
-  _FULL_TEXT_MIN_LENGTH = 3
 
   class Query(db.Query):
     """A subclass of db.Query that supports full text search."""
@@ -261,7 +279,9 @@ class SearchableModel(db.Model):
 
     def _get_query(self):
       """Wraps db.Query._get_query() and injects SearchableQuery."""
-      query = db.Query._get_query(self, _query_class=SearchableQuery)
+      query = db.Query._get_query(self,
+                                  _query_class=SearchableQuery,
+                                  _multi_query_class=SearchableMultiQuery)
       if self._search_query:
         query.Search(self._search_query)
       return query
