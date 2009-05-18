@@ -17,9 +17,9 @@ along with Shell-Sink.  If not, see <http://www.gnu.org/licenses/>.
 """
 import unittest
 from google.appengine.api.users import User
-from shell_sink.command import *
-from shell_sink.sysadmin import *
-from shell_sink.command_tag import *
+from server.command import *
+from server.sysadmin import *
+from server.command_tag import *
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import datastore_file_stub
 
@@ -126,5 +126,5 @@ class TestCommand(unittest.TestCase):
   def clear_datastore(self):
     # Use a fresh stub datastore.
     apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
-    stub = datastore_file_stub.DatastoreFileStub('appid', '/dev/null', '/dev/null')
+    stub = datastore_file_stub.DatastoreFileStub('shell-sink', '/dev/null', '/dev/null')
     apiproxy_stub_map.apiproxy.RegisterStub('datastore_v3', stub) 
