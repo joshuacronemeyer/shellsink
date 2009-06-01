@@ -109,10 +109,6 @@ class Client:
     pid = os.fork()
     if pid > 0:
       sys.exit(0)
-    os.setsid()
-    pid = os.fork()
-    if pid > 0:
-      sys.exit(0)
     func(arg)
 
   def enable(self):
