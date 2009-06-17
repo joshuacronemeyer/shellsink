@@ -113,6 +113,7 @@ class SearchableEntity(datastore.Entity):
     self._word_delimiter_regex = word_delimiter_regex
     if isinstance(kind_or_entity, datastore.Entity):
       self._Entity__key = kind_or_entity._Entity__key
+      self._Entity__unindexed_properties = frozenset(kind_or_entity.unindexed_properties())
       self.update(kind_or_entity)
     else:
       super(SearchableEntity, self).__init__(kind_or_entity, *args, **kwargs)
