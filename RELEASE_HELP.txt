@@ -1,0 +1,28 @@
+##Instructions for creating a new release of the client code to push to the
+##shellsink PPA.  Of course *I* use shellsink for this, but I thought somebody
+##else might have to do this someday.
+
+##Dependencies:
+-dput
+-debuild
+-dch
+
+##Make the ~/.dput.cf file have this entry
+[shellsink-ppa]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~shellsink/ubuntu/
+login = anonymous
+allow_unsigned_uploads = 0
+
+##Of course you need the shellsink pgp key to sign packages
+
+##Steps:
+bzr co lp:shellsink #get the code
+cd shellsink 
+mv client shellsink #the directory we are packaging must match package name
+cd shellsink/debian
+dch -v 0.2.0 #update the changelog and version
+debuild -S #build the source deb
+cd ../..
+dput shellsink-ppa shellsink_0.2.0_source.changes #send the change to the ppa

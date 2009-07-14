@@ -1,3 +1,11 @@
+shellsink (0.2.0) hardy; urgency=low
+
+  * remove unnecessary fork
+
+  * change rules file to use dcbs
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Mon, 13 Jul 2009 18:01:31 -0700
+
 shellsink (0.1.9) hardy; urgency=low
 
   * refine new logging stuff so it works right on linux systems with remote
