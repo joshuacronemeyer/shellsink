@@ -23,6 +23,7 @@ cd shellsink
 mv client shellsink #the directory we are packaging must match package name
 cd shellsink/debian
 dch -v 0.2.0 #update the changelog and version
-debuild -S #build the source deb
-cd ../..
+cd shellsink
+make buildsrc #build the source deb
+cd ..
 dput shellsink-ppa shellsink_0.2.0_source.changes #send the change to the ppa
