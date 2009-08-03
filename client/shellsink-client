@@ -24,6 +24,7 @@ import socket
 import getopt
 import sys
 import os
+import re
 import logging, logging.handlers
 
 SOCKET_TIMEOUT=10
@@ -54,6 +55,17 @@ class Client:
     data = urllib.urlencode(params)
     return self.send_tag_url + '?' + data
 
+  def inline_tags(self, command):
+    #Regex that ignores escaped comments..
+    #Slight bug is that bash escapes entire chains of hash characters
+    #So \##foo is not a comment, but my regex only calls the first hash escaped
+    #This is here because Python lookbehinds don't match variable amounts of text
+    #I prefer this ugly comment to a nasty loop
+    comment = re.compile('(?<!\\\)#(.*?)')
+    match_result = comment.split(command)
+    if (len(match_result) == 3):
+      return match_result[2].strip().split(":")
+
   def url_with_pull_command(self):
     params = {'hash': self.id}
     if self.tag:
@@ -68,10 +80,14 @@ class Client:
     if response:
       command_id = response.readline().strip()
       the_tags = tags.split(":")
+      if self.inline_tags(self.history.latest()):
+        the_tags.extend(self.inline_tags(self.history.latest()))
       for tag in the_tags:
         self.http_get(self.url_with_send_tag(tag, command_id))
   
   def http_get(self, url):
+    if self.verbose:
+      logger.info("Attempt HTTP GET with " + url)
     response = None
     try:
       response = urllib2.urlopen(url)
@@ -91,8 +107,6 @@ class Client:
       response = self.spawn_process(self.async_sending_of_command_and_tags, self.tags)
   
   def get_history(self):
-    if self.verbose:
-      print "Attempt HTTP GET with " + self.url_with_pull_command()
     response = self.http_get(self.url_with_pull_command())
     commands = response.read()
     if commands.find('<shellsink-commands>') < 0:
@@ -199,12 +213,6 @@ def get_keyword(opts):
       return opt[1]
   return None
 
-def is_verbose(opts):
-  for opt in opts:
-    if opt[0] in ["-v", "--verbose"]:
-      return True
-  return False
-
 def verify_environment():
   if not os.environ.has_key('HOME'):
     raise Exception, "HOME environment variable must be set"
@@ -227,12 +235,12 @@ def logger():
   return logger
 
 def usage():
-  print """usage: shellsink-client [ -h|-e|-d|-p [ -t TAG|-k KEYWORD|-v ] ] | [ --help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD|--verbose ] ]
+  print """usage: shellsink-client [ -v|-h|-e|-d|-p [ -t TAG|-k KEYWORD ] ] | [ --verbise|--help|--enable|--disable|--pull [ --tag TAG|--keyword KEYWORD ] ]
   The pull option pulls the most recent commands from the server into your history.  Specifying a tag or keyword along with the pull command will pull the most recent commands matching that tag or keyword into your history.  You cannot combine tags and keywords in your search.  The verbose option will output commands that were returned by the pull operation to standard out."""
 
 def main():
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hedpt:k:v", ["help", "enable", "disable", "pull", "tag=", "keyword=", "verbose"])
+    opts, args = getopt.getopt(sys.argv[1:], "vhedpt:k", ["verbose", "help", "enable", "disable", "pull", "tag=", "keyword="])
   except getopt.GetoptError, err:
     # print help information and exit:
     print str(err) # will print something like "option -a not recognized"
@@ -242,7 +250,9 @@ def main():
   client = Client()
   client.conf()
   for o, a in opts:
-    if o in ("-h", "--help"):
+    if o in ("-v", "--verbose"):
+      client.verbose = True
+    elif o in ("-h", "--help"):
       usage()
       sys.exit()
     elif o in ("-e", "--enable"):
@@ -254,8 +264,6 @@ def main():
     elif o in ("-p", "--pull"):
       client.tag = get_tag(opts)
       client.keyword = get_keyword(opts)
-      if is_verbose(opts):
-        client.verbose = True
       client.pull()
       print "History file updated.  Execute 'history -r' to add the commands to your current bash session."
       sys.exit(0)
