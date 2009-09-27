@@ -83,7 +83,9 @@ class TestShellSinkClient(unittest.TestCase):
     self.assertEquals("mykeyword", get_keyword(opts))
 
 class StubClient(Client):
-
+  #This is a big stink bomb in here.
+  #Stubbing a piece of what I am testing.
+  #Major code smell.  Could use dependency injection or somesuch.
   def __init__(self):
     self.spawned = False
     self.tags = []

@@ -1,13 +1,21 @@
 #Shellsink
 #See http://shell-sink.blogspot.com/2008/12/installing-shellsink-client-application.html for installation instructions.
+
 # number of lines kept in history
 export HISTSIZE=1000
+
 # number of lines saved in the history after logout
 export SAVEHIST=1000
+
 # location of history
 export HISTFILE=~/.zhistory
+
 # append command to history file once executed
 setopt inc_append_history
+
+# allow interactive comments
+setopt interactivecomments
+
 # execute shellsink before a new command is run
 function precmd {         
   /path/to/shellsink-client;
