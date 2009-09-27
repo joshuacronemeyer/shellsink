@@ -1,3 +1,10 @@
+shellsink (0.2.1) hardy; urgency=low
+
+  * Inline comments are used as tags in shellsink
+  * Added the extra fork back since it changed terminal behavior in osx 
+
+ -- Josh Cronemeyer <joshuacronemeyer@shellsink.com>  Sun, 27 Sep 2009 15:18:29 -0700
+
 shellsink (0.2.0) hardy; urgency=low
 
   * remove unnecessary fork
